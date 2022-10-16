@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "QkIHbvk60z6Xom6M8ewe4ABpgRBqdX0cM4C16+rcqxL6Lznub2A0vjHqMbIPvowjcYLeNDjRPTzqhlbTrBTD4w==",
+  "success": true,
+  "projectFilePath": "/Users/ryancontento/1-DEV/Projects/PongClone/PongClone.csproj",
+  "expectedPackageFiles": [
+    "/Users/ryancontento/.nuget/packages/raylib-cs/4.2.0.1/raylib-cs.4.2.0.1.nupkg.sha512",
+    "/Users/ryancontento/.nuget/packages/system.numerics.vectors/4.5.0/system.numerics.vectors.4.5.0.nupkg.sha512"
+  ],
+  "logs": []
+}
