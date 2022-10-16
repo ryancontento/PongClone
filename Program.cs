@@ -79,8 +79,8 @@ namespace Pong
                     ball.position.Y += ball.speed.Y;
 
                     if ((ball.position.Y >= (GetScreenHeight() - ball.radius)) || (ball.position.Y <= ball.radius)) ball.speed.Y *= -1.0f;
-                    if (CheckCollisionCircleRec(ball.position, ball.radius, player1.body)) ball.speed.X *= 1.0f;
-                    if (CheckCollisionCircleRec(ball.position, ball.radius, player2.body)) ball.speed.X *= 1.0f;
+                    if (CheckCollisionCircleRec(ball.position, ball.radius, player1.body)) ball.speed.X *= -1.0f;
+                    if (CheckCollisionCircleRec(ball.position, ball.radius, player2.body)) ball.speed.X *= -1.0f;
 
                     //Score
                     if ((ball.position.X >= (GetScreenWidth() - ball.radius)))
