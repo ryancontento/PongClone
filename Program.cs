@@ -6,76 +6,138 @@ using static Raylib_cs.Color;
 
 namespace Pong
 {
-    public class PongClone
+    public class Game 
     {
-        public static int Main()
+        const int ScreenWidth = 1280;
+        public const int ScreenHeight = 720;
+        static int framesCounter;
+        static Player player1 = new Player();
+        static Player player2 = new Player();
+        static Ball ball = new Ball();
+        static void Main()
         {
-            // Initialization
-            //--------------------------------------------------------------------------------------
-            const int screenWidth = 1200;
-            const int screenHeight = 900;
+            InitWindow(ScreenWidth, ScreenHeight, "Pong");
 
-            InitWindow(screenWidth, screenHeight, "pong");
+            InitGame();
 
-             Vector2 playerOnePosition = new Vector2(150 - 120, 300);
-             Vector2 playerTwoPosition = new Vector2(1100, (float)screenHeight / 2);
+            framesCounter = 0;
 
+            SetTargetFPS(60);
 
-            SetTargetFPS(240);
-            //--------------------------------------------------------------------------------------
-
-            // Main game loop
-            while (!WindowShouldClose())    // Detect window close button or ESC key
+            while (!WindowShouldClose())
             {
-                // Player Two - arrow key controls 
-                //----------------------------------------------------------------------------------
-                // if (IsKeyDown(KEY_D))
-                //     playerOnePosition.X += 2.0f;
-                // if (IsKeyDown(KEY_A))
-                //     playerOnePosition.X -= 2.0f;
-                if (IsKeyDown(KEY_W))
-                    playerOnePosition.Y -= 2.0f;
-                if (IsKeyDown(KEY_S))
-                    playerOnePosition.Y += 2.0f;
-                //----------------------------------------------------------------------------------
+                // Change state of ball
+                if (IsKeyPressed(KeyboardKey.KEY_P))
+                {
+                    if (!ball.active) ball.active = true;
+                    else ball.active = false;
+                }
 
-                // Player Two - arrow key controls 
-                //----------------------------------------------------------------------------------
-                // if (IsKeyDown(KEY_RIGHT))
-                //     playerTwoPosition.X += 2.0f;
-                // if (IsKeyDown(KEY_LEFT))
-                //     playerTwoPosition.X -= 2.0f;
-                if (IsKeyDown(KEY_UP))
-                    playerTwoPosition.Y -= 2.0f;
-                if (IsKeyDown(KEY_DOWN))
-                    playerTwoPosition.Y += 2.0f;
-                //----------------------------------------------------------------------------------
+                if (IsKeyPressed(KeyboardKey.KEY_M))
+                {
+                    MaximizeWindow();
+                }
 
-                // Draw
-                //----------------------------------------------------------------------------------
+                // Player 1 movement
+                if (player1.body.y > 10)
+                {
+                    if (IsKeyDown(KeyboardKey.KEY_W)) player1.body.y -= player1.speed;
+
+                }
+                if (player1.body.y < 560)
+                {
+                    if (IsKeyDown(KeyboardKey.KEY_S)) player1.body.y += player1.speed;
+                }
+
+                // Player 2 movement
+                if (player2.body.y > 10)
+                {
+                    if (IsKeyDown(KeyboardKey.KEY_UP)) player2.body.y -= player2.speed;
+
+                }
+                if (player2.body.y < 560)
+                {
+                    if (IsKeyDown(KeyboardKey.KEY_DOWN)) player2.body.y += player2.speed;
+                }
+
                 BeginDrawing();
-                ClearBackground(RAYWHITE);
 
-                DrawText("Pong", 20, 20, 20, DARKGRAY);
+                ClearBackground(Color.BLACK);
+                DrawRectangleRec(player1.body, Color.GRAY);
+                DrawRectangleRec(player2.body, Color.GRAY);
+                DrawCircleV(ball.position, ball.radius, Color.GRAY);
 
-                DrawLine(18, 42, screenWidth - 18, 42, BLACK);
-
-                // Player One -- left 
-                DrawRectangle((int)playerOnePosition.X, (int)playerOnePosition.Y, 50, 150,  BLUE);
-
-                // Player Two -- right
-                DrawRectangle((int)playerTwoPosition.X, (int)playerTwoPosition.Y, 50, 150,  RED);
+                DrawText("PLAYER 1 : " + player1.score, 60, 685, 25, Color.WHITE);
+                DrawText("PLAYER 2 : " + player2.score, 1060, 685, 25, Color.WHITE);
 
                 EndDrawing();
-                //----------------------------------------------------------------------------------
+
+                if (ball.active)
+                {
+                    // Bouncing ball logic
+                    ball.position.X += ball.speed.X;
+                    ball.position.Y += ball.speed.Y;
+
+                    if ((ball.position.Y >= (GetScreenHeight() - ball.radius)) || (ball.position.Y <= ball.radius)) ball.speed.Y *= -1.0f;
+                    if (CheckCollisionCircleRec(ball.position, ball.radius, player1.body)) ball.speed.X *= 1.0f;
+                    if (CheckCollisionCircleRec(ball.position, ball.radius, player2.body)) ball.speed.X *= 1.0f;
+
+                    //Score
+                    if ((ball.position.X >= (GetScreenWidth() - ball.radius)))
+                    {
+                        player1.score += 1;
+                        ball.position.Y = GetScreenHeight() / 2;
+                        ball.position.X = GetScreenWidth() / 2;
+                        ball.active = false;
+                    }
+                    if (ball.position.X <= ball.radius)
+                    {
+                        player2.score += 1;
+                        ball.position.Y = GetScreenHeight() / 2;
+                        ball.position.X = GetScreenWidth() / 2;
+                        ball.active = false;
+                    }
+
+                }
+
+                Console.WriteLine(++framesCounter);
+
             }
 
-            // De-Initialization
-            //--------------------------------------------------------------------------------------
-            CloseWindow();        // Close window and OpenGL context
-            //--------------------------------------------------------------------------------------
-
-            return 0;
+            CloseWindow();
         }
+
+        static void InitGame()
+        {
+            framesCounter = 0;
+            player1.score = 0;
+            player2.score = 0;
+
+            player1.body = new Rectangle(15, (ScreenHeight / 2) - 75, 30, 150);
+            player2.body = new Rectangle(1235, (ScreenHeight / 2) - 75, 30, 150);
+            player1.speed = 8;
+            player2.speed = 8;
+
+            ball.position.Y = GetScreenHeight() / 2;
+            ball.position.X = GetScreenWidth() / 2;
+            ball.radius = 10;
+            ball.speed = new Vector2(9f, 7f);
+            ball.active = false;
+        }
+    }
+
+    public class Ball
+    {
+        public Vector2 position;
+        public Vector2 speed;
+        public float radius;
+        public bool active;
+    }
+
+    public class Player
+    {
+        public int speed;
+        public Rectangle body;
+        public int score;
     }
 }
